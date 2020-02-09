@@ -10,9 +10,10 @@ Author: Tim Hannifan
 
 import sys
 import os
+import re
 from hash import generate_sha256_hash
-from genkeys import generate_credentials
-
+from genkeys import generate_credentials, get_private_key, get_keyhash, get_private_keys
+from encrypt import write_ciphertext
 
 CREDENTIALS_STORE = 'credentials.txt'
 USER = 'timhannifan'
@@ -25,8 +26,22 @@ def get_user_credentials(username, password, credentials_store):
         print('Generating credentials...')
         generate_credentials(username, password, credentials_store)
 
+    creds = []
     with open(credentials_store, 'r') as credentials:
-        return [line.strip() for line in credentials]
+        creds = [line.strip() for line in credentials]
+
+    msg_creds = re.split(':',creds[0])
+    sig_creds = re.split(':',creds[0])
+
+    # TODO: check username in creds is same as passed username
+    msg_salt = msg_creds[3]
+    private_key = get_private_key(password, msg_salt)
+    print('msgcreds',private_key)
+    print('keyhash', get_keyhash(private_key))
+
+    return creds
+
+
 
 def run(command, input_file, output_file):
     """TODO
@@ -44,8 +59,11 @@ def run(command, input_file, output_file):
     """
     if command == 'encrypt':
         print('Encrypting file...')
-        credentials = get_user_credentials(USER, PWD, CREDENTIALS_STORE)
-        print(credentials)
+        # credentials = get_user_credentials(USER, PWD, CREDENTIALS_STORE)
+        msg_keys = get_private_keys(PWD)
+        sig_keys = get_private_keys(PWD)
+
+        write_ciphertext(msg_keys, input_file, output_file)
 
 
 
