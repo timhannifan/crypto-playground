@@ -54,7 +54,7 @@ def run(fpath, sig_key=None):
         hasher.update(sig_key)
 
     res = (hasher.hexdigest(), os.path.basename(fpath))
-    print('{}  {}'.format(res[0], res[1]))
+    # print('{}  {}'.format(res[0], res[1]))
 
     return hasher.hexdigest()
 
