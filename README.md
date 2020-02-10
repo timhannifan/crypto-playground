@@ -12,6 +12,7 @@ To use the encryption and decryption utilities, use the following commands:
 python filecrypt.py encrypt <input file> <output file>
 python filecrypt.py decrypt <input file> <output file>
 ```
+
 ## Construction
 ### Key generation/derivation
 A weak password is hardcoded in filecrypt.py for demonstration purposes. When the encryption command is run, keys are derived using hashlib's `pbkdf2_hmac`. A strong password is created by adding a 128-bit salt generated from `os.urandom` (a cryptographically secure pseudorandom number generator) and then run through 100,000 iterations. The user's private keys are printed to the screen for transport out-of-band to the remote server. Two keys are generated: an encryption key and an authentication key.
@@ -41,7 +42,7 @@ A root user on a remote server would be prevented from decrypting the ciphertext
 
 
 ## Bugs and Errors
-The code currently supports text files. Some issues were encountered during the construction of a stream cipher in CTR mode, which prevented extending this to larger files and other formats.
+The code is currently limited to very small text files until further work can be completed on a stream cipher for binary files and generating longer keys in a stream cipher.
 
 ## Requirements
 - Python 3.6

@@ -39,33 +39,38 @@ def get_user_credentials(username, password, credentials_store):
     # TODO: check username in creds is same as passed username
     msg_salt = msg_creds[3]
     private_key = get_private_key(password, msg_salt)
-    print('msgcreds',private_key)
-    print('keyhash', get_keyhash(private_key))
-
     return creds
 
 
 
 def xor(message, key):
+    """Calculates the exclusive-or of a message and a key"""
+
+    # Pad the message to length of key if necessary
     if len(message) < len(key):
         diff = len(key) - len(message)
         message = message + b'\x00' * diff
 
-    """xor two strings together."""
+    # Comput xor
     if (isinstance(message, str)):
-        return b"".join(chr(ord(a) ^ ord(b)) for a, b in zip(message, key))
+        return b"".join(chr(ord(x) ^ ord(y)) for x, y in zip(message, key))
     else:
-        return bytes([a ^ b for a, b in zip(message, key)])
+        return bytes([x ^ y for x, y in zip(message, key)])
+
 
 def write_output(data, fpath):
+    """Writes output to a file"""
     print('Writing output...')
     with open(fpath, 'a') as file:
         file.write(data)
 
+
 def verify_integrity(fname, sig_key):
+    """Verifies the integrity of a file by checking the hash of the 
+    ciphertext plus the signature key."""
     with open(HASH_RECORD) as json_file:
         data = json.load(json_file)
-        
+
         if ((fname in data) and 
             (generate_sha256_hash(fname, sig_key ) == data[fname])):
             print('Integrity check successful')
@@ -73,6 +78,8 @@ def verify_integrity(fname, sig_key):
         return False
 
 def write_authentication_tag(output_file, sig_key):
+    """Writes a hash of the cipertext and signature key to the hash
+    record."""
     tag = generate_sha256_hash(output_file, sig_key)
     record = {}
     record[output_file] = tag
@@ -82,7 +89,7 @@ def write_authentication_tag(output_file, sig_key):
 
 
 def run(command, input_file, output_file):
-    """TODO
+    """Main function for encryption and decryption. Produces ciphertext from a raw input in encrypt mode, and generates plaintext from ciphertext in decrypt mode.
 
     Args:
       command: A string, either 'encrypt' or 'decrypt'.
@@ -91,19 +98,16 @@ def run(command, input_file, output_file):
 
     Returns:
       Nothing
-
-    Raises:
-      ModuleNotFoundError: If hashlib is not found
     """
     if command == 'encrypt':
         print('Encrypting file...')
         if os.path.exists(output_file):
             os.remove(output_file)
-        # credentials = get_user_credentials(USER, PWD, CREDENTIALS_STORE)
+
         msg_keys = get_private_keys(PWD)
         sig_keys = get_private_keys(PWD)
-        print('msgkey:', msg_keys[1])
-        print('sigkey:', sig_keys[1])
+        print('Secret msg key:', msg_keys[1])
+        print('Secret sig key:', sig_keys[1])
 
         with open(input_file, 'r') as file:
             message = file.read()
