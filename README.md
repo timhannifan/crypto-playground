@@ -25,7 +25,7 @@ After the ciphertext is written, a SHA-256 hash of the ciphertext with the user'
 ### Verification
 When the decrypt command is run, the ciphertext file's integrity is checked by computing the SHA-256 hash of the ciphertext plus the user's authentication key. This hash should match the one computed and stored in the JSON file mentioned above. If these hashes do not match, either the wrong authentication key was provided or the ciphertext was modified.
 
-## Decryption
+### Decryption
 If verification is passed, the users is prompted to enter their secret encryption key. This encryption key is then x-or'd with the ciphertext to arrive at the decrypted plaintext. This plaintext is then written to the specified output file.
 
 ## Generated Artifacts
@@ -40,9 +40,8 @@ The decryption process protects against manipulation of the ciphertext through a
 A root user on a remote server would be prevented from decrypting the ciphertext two ways. First, the user would need two private keys to verify/decrypt a message, and those are not stored anywhere in the clear. Second, the file verification would prevent unidentifiable maniuplation of the ciphertext; any changes made would result if verification failure.
 
 
-
 ## Bugs and Errors
-The code currently supports text files. Some issues were encountered during the construction of a stream cipher in CTR mode.
+The code currently supports text files. Some issues were encountered during the construction of a stream cipher in CTR mode, which prevented extending this to larger files and other formats.
 
 ## Requirements
 - Python 3.6
