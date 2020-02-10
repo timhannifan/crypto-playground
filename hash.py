@@ -10,25 +10,21 @@ Author: Tim Hannifan
 import sys
 import os
 from functools import partial
-# hashlib imported and checked in main
+# hashlib is imported in run()
 
 BLOCK_SIZE = 1024
 
-def import_hashlib():
-    # Check that hashlib can be imported
-    try:
-        import hashlib
-    except ModuleNotFoundError:
-        sys.exit('Error: hashlib not found.')
+def generate_sha256_hash(fpath, sig_key=None):
+    """Public function to generate SHA256 hash.
+    Args:
+      fpath: A filepath for the file to be hashed.
 
-def generate_sha256(fpath):
-    # import_hashlib()
+    Returns:
+      tuple: (hexidecimal hash value, filename)
+    """
+    return run(fpath, sig_key)
 
-    if not os.path.isfile(fpath):
-        sys.exit('Error: Supplied filepath does not refer a valid file.')
-    return run(fpath)
-
-def run(fpath):
+def run(fpath, sig_key=None):
     """Prints the sha256 hexdigest of a file.
 
     Args:
@@ -46,14 +42,22 @@ def run(fpath):
     except ModuleNotFoundError:
         sys.exit('Error: hashlib not found.')
 
+    if not os.path.isfile(fpath):
+        sys.exit('File Error: Supplied filepath does not refer a valid file.')
+    
     # Initialize hasher and iterate through blocks of file
     hasher = hashlib.sha256()
     with open(fpath, 'rb') as file:
         for chunk in iter(partial(file.read, BLOCK_SIZE), b''):
             hasher.update(chunk)
+    if sig_key is not None:
+        hasher.update(sig_key)
 
-    # print('{}  {}'.format(hasher.hexdigest(), os.path.basename(fpath)))
-    return (hasher.hexdigest(), os.path.basename(fpath))
+    res = (hasher.hexdigest(), os.path.basename(fpath))
+    print('{}  {}'.format(res[0], res[1]))
+
+    return hasher.hexdigest()
+
 
 if __name__ == '__main__':
     # Check CLI arguments, correct command is "python3 hash.py <filepath>"
@@ -61,7 +65,5 @@ if __name__ == '__main__':
         sys.exit('Error: No filepath supplied in arguments.')
     elif len(sys.argv) > 2:
         sys.exit('Error: Too many arguments supplied.')
-    elif not os.path.isfile(sys.argv[1]):
-        sys.exit('Error: Supplied filepath does not refer a valid file.')
 
     run(sys.argv[1])
