@@ -137,10 +137,12 @@ def run(command, input_file, output_file):
             cipher_hex = file.read()
             cipher_text = bytes.fromhex(cipher_hex)
 
-            key = bytes.fromhex('d4b438c6857a117c449caac3ea0621f3751390f63fd18e76bf07ac00b2696c5e')
-            # print(type(key),type(cipher_text))
-            decrypted = xor(cipher_text, key)
-            print(decrypted)
+            key = bytes.fromhex(input('Secret message key: '))
+
+            decrypted = xor(cipher_text, key).decode('utf-8')
+            
+            write_output(decrypted, output_file)
+
             # print(decrypted.decode('utf8'))
             # print(decrypted.decode('utf-8', 'backslashreplace'))
 # 
